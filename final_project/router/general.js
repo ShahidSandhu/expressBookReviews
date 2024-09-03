@@ -32,16 +32,16 @@ public_users.post("/register", (req,res) => {
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
   //Write your code here
-  const availableBooks = books;
-
-  // Check if there are available books
-  if (availableBooks.length === 0) {
-    return res.status(404).json({ message: "No book is available" });
-  }
-
-  // If books are available, send them as a response
-  return res.status(200).json(availableBooks);
-  // return res.status(300).json({message: "Yet to be implemented- in default route '/'"});
+  new Promise((resolve, reject) => {
+    resolve(JSON.stringify(books))
+  })
+  .then((data) => {
+      return res.status(200).json({ data })
+    })
+  .catch((error) => {
+      return res.status(400).json({ message: error })
+    })
+    // return res.status(300).json({message: "Yet to be implemented- in default route '/'"});
 });
 
 // Get book details based on ISBN
