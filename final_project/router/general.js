@@ -13,7 +13,7 @@ public_users.post("/register", (req,res) => {
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
   //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  return res.status(300).json({message: "Yet to be implemented- in default route '/'"});
 });
 
 // Get book details based on ISBN
@@ -31,7 +31,13 @@ public_users.get('/author/:author',function (req, res) {
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
   //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  // Extract the email parameter from the request URL
+  const title = req.params.title;
+  // Filter the users array to find users whose email matches the extracted email parameter
+  let filtered_books = books.filter((title) => books.title === title);
+  // Send the filtered_users array as the response to the client
+  return res.send(filtered_books);
+  // return res.status(300).json({message: "Yet to be implemented"});
 });
 
 //  Get book review
