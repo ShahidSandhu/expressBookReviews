@@ -4,10 +4,11 @@ let books = require("./booksdb.js");
 const regd_users = express.Router();
 
 let users = [];
+const SECRET_KEY = 'fingerprint_customer';
 
 const isValid = (username)=>{ //returns boolean
   //write code to check is the username is valid
-  let filtered_users = users.filter((user)=> user.username === user);
+  let filtered_users = users.filter((user)=> user.username === username);
   if(filtered_users){
     return true;
   }
@@ -30,15 +31,15 @@ const authenticatedUser = (username,password)=>{ //returns boolean
 //only registered users can login
 regd_users.post("/login", (req,res) => {
   //Write your code here
-  const { username, password } = req.body
+  const username = req.body.username;
+  const password = req.body.password;
 
   if (!isValid(username) || !authenticatedUser(username, password)) {
     return res.status(401).json({ message: 'Username or Password are invalid' })
   }
 
   const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: 60*60 })
-  users.find((u) => u.username === username).token = token
-  console.log(users)
+  users.filter((u) => u.username === username).token = token
   res.send("User has logged in Successfully")
   return res.status(200).json({ token })
   
