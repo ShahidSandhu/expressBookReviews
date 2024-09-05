@@ -29,18 +29,26 @@ public_users.post("/register", (req,res) => {
   // return res.status(300).json({message: "Yet to be implemented"});
 });
 
-// Get the book list available in the shop
-public_users.get('/',function (req, res) {
-  new Promise((resolve, reject) => {
-    resolve(books)
-  })
-  .then((Books) => {
-      return res.status(200).json({ Books })
-    })
-  .catch((error) => {
-      return res.status(400).json({ message: error })
-    })
+// Get the book list available in the shop using Async Callback
+public_users.get('/', async function (req, res) {
+  try {
+    const bookList = await getBookList();
+    return res.status(200).json(bookList);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
+
+async function getBookList() {
+  return new Promise((resolve, reject) => {
+    const bookList = books;
+
+    setTimeout(() => {
+      resolve(bookList);
+    }, 2000); 
+  });
+}
 
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn', function(req, res) {
