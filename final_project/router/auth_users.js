@@ -63,59 +63,50 @@ regd_users.post("/login", (req, res) => {
 
 		return res.status(200).json({ message: "Login successful", accessToken });
 	} else {
-		return res.status(401).json({ message: "Invalid username or password" });
+		return res.status(401).json({ message: "Either username or password or both are invalid !" });
 	}
 });
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-	//Write your code here
-	const isbn = req.params.isbn;
-	const review = req.body.review;
-	const username = req.session.username;
-	let booksObject = Object.values(books);
-	const book = booksObject.find((book) => book.isbn == isbn);
+    const isbn = req.params.isbn;
+    const review = req.body.review;
+    const username = req.session.username;
+    const book = books[isbn];
+    if (!book) {
+        res.status(404).send({message : `Your ISBN ${isbn} is invalid !`});
+        return;
+    }
 
-	if (!book) {
-		res.status(404).send("You have entered and invalid ISBN");
-		return;
-	}
+    // If the user already posted a review for this book, modify the existing review
+    if (book.reviews[username]) {
+        book.reviews[username] = review;
+        res.json(
+            `Your review has been updated for the book ${book.title} by ${
+                book.author
+            } with ISBN ${isbn}: ==>${JSON.stringify(book)}`
+        );
 
-	// If the user already posted a review for this book, modify the existing review
-	if (book.reviews[username]) {
-		book.reviews[username] = review;
-		//res.json('Your review has been updated for the book with ISBN ' + isbn + ':'+ `${book}`);
-		res.json(
-			`Your review has been updated for the book ${book.title} by ${
-				book.author
-			} with ISBN ${isbn}: ==>${JSON.stringify(book)}`
-		);
+        return;
+    }
 
-		return;
-	}
-
-	// If the user didn't post a review for this book, add a new review
-	book.reviews[username] = review;
-	//res.send('Your review has been posted for the book with ISBN ' + isbn + ':'+ `${book}`);
-	res.json(
-		`Your review has been posted for the book ${book.title} by ${
-			book.author
-		} with ISBN ${isbn}: ==>${JSON.stringify(book)}`
-	);
+    // If the user didn't post a review for this book, add a new review
+    book.reviews[username] = review;
+    res.json(
+        `Your review has been posted for the book ${book.title} by ${
+            book.author
+        } with ISBN ${isbn}: ==>${JSON.stringify(book)}`
+    )
+  
 });
 
 regd_users.delete("/auth/review/:isbn", (req, res) => {
-	//Write your code here
 	const isbn = req.params.isbn;
 	const username = req.session.username;
-	let booksObject = Object.values(books);
-	const book = booksObject.find((book) => book.isbn == isbn);
-	const review = book.reviews[username];
-
-	console.log(review);
+	const book = books[isbn];
 
 	if (!book) {
-		res.status(404).send("You have entered and invalid ISBN");
+		res.status(404).send({message:`Your ISBN ${isbn} is invalid !`});
 		return;
 	}
 
@@ -123,18 +114,16 @@ regd_users.delete("/auth/review/:isbn", (req, res) => {
 		res
 			.status(404)
 			.send(
-				`No reivew mathing your username and ISBN  ${isbn}: ==>${JSON.stringify(
+				`No reivew found against your username and ISBN  ${isbn}: ==>${JSON.stringify(
 					book
 				)}`
 			);
 		return;
 	}
 
-	// If the user didn't post a review for this book, add a new review
 	delete book.reviews[username];
-	//res.send('Your review has been posted for the book with ISBN ' + isbn + ':'+ `${book}`);
 	res.json(
-		`Your review has been deletedfor the book ${book.title} by ${
+		`Your review has been deleted for the book ${book.title} by ${
 			book.author
 		} with ISBN ${isbn}: ==>${JSON.stringify(book)}`
 	);

@@ -18,7 +18,6 @@ app.use(
 );
 
 app.use("/customer/auth/*", function auth(req, res, next) {
-	//Write the authenication mechanism here
 	// Check if user is authenticated
 	if (req.session.accessToken) {
 		let token = req.session.accessToken; // Access Token
